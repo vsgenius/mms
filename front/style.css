@@ -1,0 +1,44 @@
+.body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+
+.image-online {
+    width: 15px;
+}
+
+.bg-bez {
+    background-color: #eee6e3;
+}
+
+.bg-message-my {
+    background-color: #d91d75;
+    color:white;
+}
+.bg-message-other {
+    background-color: #c67b99;
+    color:white;
+}
+.hidden {
+    display: none;
+}
+.add-chat {
+}
+.image-icon {
+    width: 30px;
+    height: 30px;
+}
+.header-chat  {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.chat-body {
+    background-color: #bcafb7;
+}
+.active {
+    border: 1px solid white;
+    color: white;
+    background-color: #7b276f;
+}
