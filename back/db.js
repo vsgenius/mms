@@ -9,18 +9,15 @@ let db;
 
 async function main() {
   // Use connect method to connect to the server
-    await client.connect();
-    console.log('Connected successfully to server');
-    db = client.db(dbName);
-
+  await client.connect();
+  console.log('Connected successfully to server');
+  db = client.db(dbName);
 }
 
-main()
-  .then()
-  .catch(console.error);
+main().then().catch(console.error);
 
 function getDb() {
-    return db;
+  return db;
 }
 
 module.exports = getDb;

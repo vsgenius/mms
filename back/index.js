@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const fs = require('fs');
-const path = require('node:path'); 
+const path = require('node:path');
 
 const app = express();
 const server = http.createServer(app);
@@ -14,14 +14,13 @@ const getDb = require('./db');
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/audio',express.static('audio'));
+app.use('/audio', express.static('audio'));
 
 let usersOnline = new Set();
 const usersTyping = new Set();
 
 function checkToken(token) {}
 function getUserByToken(token) {}
-
 
 app.post('/register', async (req, res) => {
   const login = req.body.login;
@@ -94,38 +93,46 @@ app.post('/newchat', async (req, res) => {
 wss.on('connection', async function connection(ws) {
   ws.on('error', console.error);
   let user_id, chat_id, login;
+  const db = getDb();
   ws.on('message', async function message(data, isBinary) {
-    const db = getDb()
     if (isBinary && user_id && chat_id) {
       const fileId = uuidv4() + '.webm';
-      const filename = path.join(process.cwd(),'audio',fileId);
+      const filename = path.join(process.cwd(), 'audio', fileId);
       const fileUrl = '/audio/' + fileId;
-      fs.writeFile(filename, Buffer.from(data),()=>{
-      });
+      fs.writeFile(filename, Buffer.from(data), () => {});
       const date = Date.now();
-      const response = await db.collection('message').insertOne({type:'audio',message:{
-        chat_id:chat_id,
-        user_id:user_id,
-        login,
-        date,
-        text:'audio',
-        audio:fileUrl}});
-      for (const client of wss.clients) {
-        client.send(JSON.stringify({type:'audio',message:{
-          chat_id:chat_id,
-          user_id:user_id,
+      const response = await db.collection('message').insertOne({
+        type: 'audio',
+        message: {
+          chat_id: chat_id,
+          user_id: user_id,
           login,
           date,
-          text:'audio',
-          audio:fileUrl}}));
+          text: 'audio',
+          audio: fileUrl,
+        },
+      });
+      for (const client of wss.clients) {
+        client.send(
+          JSON.stringify({
+            type: 'audio',
+            message: {
+              chat_id: chat_id,
+              user_id: user_id,
+              login,
+              date,
+              text: 'audio',
+              audio: fileUrl,
+            },
+          })
+        );
       }
       user_id = undefined;
       chat_id = undefined;
       login = undefined;
       return;
-    }
-    else if (isBinary) {
-      console.log('only binary')
+    } else if (isBinary) {
+      console.log('only binary');
       return;
     }
     if (!data.toString()) {
@@ -144,12 +151,15 @@ wss.on('connection', async function connection(ws) {
       return;
     }
     if (message.type === 'audio') {
+      console.log('audio');
       user_id = message.message.user_id;
       chat_id = message.message.chat_id;
       login = message.message.login;
+      ws.send(JSON.stringify({ type: 'blob', message: 'ok' }));
       return;
     }
     if (message.type === 'chats') {
+      console.log(message);
       const chats = await db.collection('chat').find({}).toArray();
       ws.send(JSON.stringify({ type: 'chats', message: chats }));
       return;
@@ -193,8 +203,6 @@ wss.on('connection', async function connection(ws) {
     }
   });
 });
-
-
 
 server.listen(3000, () => {
   console.log('server ok');
